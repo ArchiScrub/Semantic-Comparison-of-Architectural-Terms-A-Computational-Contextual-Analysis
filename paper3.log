@@ -1,0 +1,2 @@
+[11:37:25] INFO | Torch device: cuda | cuda.is_available=True | cudnn.enabled=True
+[11:37:25] INFO | CUDA device: NVIDIA GeForce RTX 3080 Ti Laptop GPU | capability=(8, 6)

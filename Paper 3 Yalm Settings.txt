@@ -1,0 +1,1350 @@
+# =============================================================
+#  Main Files & Output
+# =============================================================
+corpus_dir: "txt_corpus"
+corpus_file_w2v: "W2V_Corpus.txt"
+corpus_file_bert_cased: "BERT_Corpus.txt"
+corpus_file_w2v_cl: "W2V_Corpus_CL.txt"
+corpus_file_bert_cased_cl: "BERT_Corpus_CL.txt"
+
+datasets:
+  wordsim353_path: wordsim353crowd.csv
+  wordsim353_ja_en_path: wordsim353-ja-en.csv
+
+definitional_pairs:
+  - ["wabi", "sabi"]
+  - ["ma", "en"]
+  - ["shakkei", "tsuboniwa"]
+
+# =============================================================
+#  General Runtime Settings
+# =============================================================
+seed: 42
+repeats:
+  n_runs: 1                # set to 3 later for stability
+  seeds: [42]                # leave empty to auto-derive from 'seed'
+
+hf_revision: "3f076fdb1ab68d5b2880cb87a0886f315b8146f8"
+
+reporting:
+  write_run_manifest: true
+
+paper4_runtime:
+  run_polysemy_full: true
+  run_polysemy_clean: true
+  run_zero_shot: true
+  run_zero_shot_bootstrap: false
+  run_concept_bootstrap: true
+  run_sense_aware: true
+  run_concept_alignment: true
+  run_global_viz: false
+  run_stats: true
+  run_report: true
+
+  plot_all_k: false
+
+  use_w2v_cbow: false
+  use_w2v_sg: false
+  use_bert_base: false
+  use_bert_finetuned: true
+
+  sense_report_weighted: true
+  sense_weighting: "weighted"
+
+paper4_screening:
+  min_full_contexts: 10
+  min_clean_contexts: 10
+  min_span_match_rate: 0.60
+  min_stability_if_polysemous: 0.40
+  require_clean_noncollapse: true
+  max_fallback_ratio: 0.40
+  max_full_clean_k_shift: 1
+  max_perm_p_if_polysemous: 0.05
+
+paper4_plotting:
+  export_debug_plots: true
+  export_paper_candidate_plots_only: false
+  suppress_tsne_for_k1: true
+  suppress_representative_heatmaps: true
+  suppress_k_score_plots_for_non_main_terms: false
+
+paper4_term_overrides: {}
+
+paper4_term_manual_priority: {}
+
+paper4_term_architecture_note: {}
+
+# --- Plotting Settings ---
+plotting:
+  palette:
+    # Names used if confirmatory group names are provided
+    conceptual: "#ffa500"
+    physical: "#529a54"
+    # Fallback names/colors for exploratory or missing names
+    cluster0: "#f59d05"
+    cluster1: "#529a54"
+    # Color for terms not present in a specific clustering
+    unassigned: "#808080"
+
+# --- ADDED FOR PAPER 2 ---
+# Runtime toggles (Global for both scripts)
+use_gpu: true
+use_tqdm: true
+degrade_on_missing_caches: false
+
+# Dispatch toggles for the Paper 2 script
+mode: Legacy         # LEGACY ranks splits by mean ARI against model clusterings.| FULL ranks by prototype-based concept score (from seeds or k-means), then reports ARI post-hoc.
+explore: true      # gate legacy exploratory search (legacy mode = true)
+
+# Guardrails (For Paper 2 script)
+enforce_versions: false
+require_versions:
+  python: ""
+  numpy: "1.26.4"
+  pandas: "2.2.2"
+  torch: "2.2.2+cu121"
+  sklearn: "1.4.2"
+  transformers: "4.56.0"
+verify_caches: false
+cache_hashes: {}
+self_test: false
+
+# --- Concept-alignment seeds for FULL mode ---
+concept_alignment:
+  seeds_from_grouping_csv: "seeds_from_grouping/paper2_grouping_clean_bert_top1.csv"
+  tau: 0.3
+  margin_lambda: 0.25
+  top_k: 3000
+  ambiguous_k: 8
+  include_degenerate_in_rank: false
+
+# Paper 2 Specific Runtime Controls
+ari_runtime:
+  models: ["BERT"]
+  corpora: ["FULL", "CLEAN"]
+  seed: 42
+  n_runs: 1
+  seeds: [42]
+
+  # New exploratory controls
+  top_list_n: 5000
+  top_stats_n: 30
+  closest_zero_n: 100
+  lowest_n: 30
+
+  max_samples: 5000
+  bootstrap: {enabled: true, B: 2000, ci: 0.95}
+  permutation: {enabled: true, R: 5000}
+  top_exemplars_groupings: 5
+  use_contextual_embeddings: true
+
+  confirmatory:
+    enabled: False
+    grouping:
+      ma: 0
+      mu: 0
+      wabi: 0
+      sabi: 0
+      wabi_sabi: 0
+      en: 1
+      engawa: 1
+      shōji: 1
+      fusuma: 1
+      tokonoma: 1
+      chigaidana: 1
+      doma: 1
+      genkan: 1
+      tomeishi: 1
+      ikezuishi: 1
+      shakkei: 0
+      roji: 1
+      torii: 1
+      shimenawa: 1
+      tsuboniwa: 1
+      byōbu: 1
+      hisashi: 1
+      haiden: 1
+      sandō: 1
+      aware: 0
+      honden: 1
+      chashitsu: 1
+      karesansui: 1
+    group_names: {0: "conceptual", 1: "physical"}
+
+# Other Safety Caps (For Paper 2 script)
+bootstrap_max: 2000
+permutation_max: 5000
+# --- END OF ADDITIONS FOR PAPER 2 ---
+
+
+# =============================================================
+#  Word2Vec Training Settings (shared for CBOW & SG)
+#  The script toggles sg=0/1 internally, so one path suffices.
+# =============================================================
+
+# =============================================================
+#  FINAL MODEL PARAMS - Word2Vec CBOW
+# =============================================================
+w2v_cbow_final:
+  vector_size: 100
+  window: 9
+  epochs: 50
+  min_count: 3
+  alpha: 0.01
+  min_alpha: 0.0001
+  sample: 0.001
+  workers: 1
+  sg: 0
+  hs: 1
+  negative: 0
+
+w2v_sg_final:
+  vector_size: 100
+  window: 9
+  epochs: 50
+  min_count: 3
+  alpha: 0.01
+  min_alpha: 0.0001
+  sample: 0.001
+  workers: 1
+  sg: 1
+  hs: 1
+  negative: 0
+
+# =============================================================
+#  FINAL MODEL PARAMS
+# =============================================================
+
+# ---- BERT (MLM) Final ----
+bert_final:
+  learning_rate: 3e-05  # Lowered to avoid overfit
+  per_device_train_batch_size: 32
+  num_train_epochs: 3
+  warmup_ratio: 0.06
+  weight_decay: 0.01
+  max_length: 128
+  mlm_probability: 0.15
+  gradient_accumulation_steps: 2
+  bert_candidate_min_freq: 5
+  fp16: False
+
+# =============================================================
+#  Analysis & Classification Settings
+# =============================================================
+
+# --- CHOOSE WHICH WORD LIST TO USE ---
+# Options: "all" or "core". "all" uses target_words, "core" uses core_target_words.
+word_list_to_use: "all"
+
+target_words:
+  - ma
+  - mu
+  - wabi
+  - sabi
+  - wabi_sabi
+  - en
+  - engawa
+  - shōji
+  - fusuma
+  - tokonoma
+  - chigaidana
+  - doma
+  - genkan
+  - tomeishi
+  - ikezuishi
+  - shakkei
+  - roji
+  - torii
+  - shimenawa
+  - tsuboniwa
+  - byōbu
+  - hisashi
+  - haiden
+  - sandō
+  - aware
+  - honden
+  - chashitsu
+  - karesansui
+
+core_target_words:
+  - ma
+  - mu
+  - engawa
+  - shōji
+  - tokonoma
+  - tomeishi
+  - shakkei
+
+paper4_target_term_mode: "screening"
+
+screening_pool_target_words:
+  - engawa
+  - tokonoma
+  - ma
+  - mu
+  - shakkei
+  - doma
+  - shōji
+  - fusuma
+
+main_case_target_words:
+  - engawa
+  - tokonoma
+  - ma
+  - mu
+  - shakkei
+  - doma
+  - shōji
+  - fusuma
+
+supporting_target_words:
+  - engawa
+  - tokonoma
+  - ma
+  - mu
+  - shakkei
+  - doma
+  - shōji
+  - fusuma
+
+concept_alignment_targets:
+  - engawa
+
+## --- SHARED: Clustering Parameters ---
+# General settings for K-Means and Agglomerative clustering used across both papers.
+analysis_params:
+  # NOTE: model_clusters is used by Paper 2 (binary ARI); Paper 4 ignores it.
+  model_clusters: 2
+  kmeans_n_init: 50       # ADDED: Controls KMeans robustness
+  kmeans_max_iter: 1000   # ADDED: Controls KMeans iterations
+  z_score_for_clustering: false
+  dendro_cut: true  # Draw a horizontal cut-line at height 0.5 on dendrograms for binary splits
+
+paper4_analysis_params:
+  polysemy_auto_max_k: 2
+  polysemy_min_instances: 10
+  polysemy_min_cluster_size: 3
+  representative_sentences_per_cluster: 3
+  zero_shot_bootstrap_iters: 1000
+  context_window_chars: 1200
+  kmeans_n_init: 50
+  kmeans_max_iter: 1000
+
+  multilabel_inference:
+    use_rowwise_percentile: true
+    rowwise_percentile: 95
+    topk: 0
+    min_similarity: 0.30
+    consensus_strategy: "mean"
+    require_min_models: 1
+
+## --- SHARED: t-SNE Visualization Parameters ---
+# Settings for the t-SNE dimensionality reduction plots used in both papers.
+tsne_params:
+  perplexity_divisor: 2   # ADDED: Dynamically calculate perplexity (e.g., num_words / 2)
+  pca_init_dims: 20       # ADDED: PCA components before t-SNE
+  n_iter: 1500            # ADDED: t-SNE iterations
+  early_exaggeration: 8.0 # ADDED: t-SNE tuning parameter
+
+## --- PAPER 1: Specific Visual Diagnostic Settings ---
+# Parameters for plots and analyses that are unique to Paper 1.
+paper1_visuals:
+  similarity_threshold: 0.25
+  cooccurrence_window: 5
+  cooccurrence_top_n: 10
+  # used by BERT top-N candidate filtering in get_top_n_similar()
+  bert_candidate_min_freq: 5
+
+## --- PAPER 2: Specific Analysis Settings ---
+# Parameters for analyses that are unique to Paper 2.
+paper2_analysis:
+  similarity_threshold: 0.25
+
+  # nodes to emphasise in similarity webs
+  highlight_central:
+    - ma
+    - tokonoma
+
+  # web drawing controls
+  web_topk_per_node: 3
+  web_global_quantile: 0.85
+  web_use_mst: true
+  web_label_fontsize: 9
+
+
+# --- MOVED FOR PAPER 2 SCRIPT ---
+# This block was inside ari_settings:
+# Moved to top level so the Paper 2 script can find it.
+paper2_exploratory:
+  words_to_explore:
+  - ma
+  - mu
+  - wabi
+  - sabi
+  - wabi_sabi
+  - en
+  - engawa
+  - shōji
+  - fusuma
+  - tokonoma
+  - chigaidana
+  - doma
+  - genkan
+  - tomeishi
+  - ikezuishi
+  - shakkei
+  - roji
+  - torii
+  - shimenawa
+  - tsuboniwa
+  - byōbu
+  - hisashi
+  - haiden
+  - sandō
+  - aware
+  - honden
+  - chashitsu
+  - karesansui
+  exemplars_per_term: 3
+
+  # --- Polysemy (Paper 4, automatic k selection) ---
+  # The script will test k = 1..min(n_contexts, polysemy_auto_max_k),
+  # score with Silhouette & Calinski–Harabasz, check stability, then pick the best k.
+  #polysemy_auto_max_k: 10
+  #polysemy_min_instances: 3
+
+  # --- Multi-label inference thresholds (Paper 4) ---
+  multilabel_inference:
+    use_rowwise_percentile: true   # if false, uses top-k instead
+    rowwise_percentile: 90         # per-term percentile threshold
+    topk: 0                        # if >0 and use_rowwise_percentile=false, take top-k labels
+    min_similarity: 0.25           # absolute safety floor (cosine)
+    consensus_strategy: "mean"     # merge model scores: "mean" or "median"
+    require_min_models: 1          # min # of models needed to label a term
+
+definitional_audit:
+  bootstrap_n: 2000     # 1000–2000 is good
+  report_ci: true       # write mean ± 95% CI to CSV
+
+# ---- Zero-shot (for Paper 4) ----
+zero_shot:
+  labels:
+    Aesthetic: ["beauty", "grace", "elegance"]
+    Moral: ["virtue", "duty", "honour"]
+  targets: ["poetry", "architecture", "law", "ritual"]
+  models: ["CBOW", "Skip-gram", "BERT_BASE", "BERT_FINETUNED"]
+  confidence_threshold: 0.60
+  write_per_doc_scores: true
+
+concept_definitions:
+  boundary_edge_axis:
+    - edge
+    - border
+    - boundary
+    - threshold
+    - verge
+    - margin
+    - frame
+    - periphery
+
+  connector_flow_axis:
+    - connect
+    - connection
+    - passage
+    - transition
+    - movement
+    - circulation
+    - flow
+    - link
+
+  river_bank_probe:
+    - riverbank
+    - river-bank
+    - waterside
+    - bank
+    - embankment
+    - riverside
+
+
+# =============================================================
+#  Adjusted Rand Index (ARI) Settings
+# =============================================================
+ari_settings:
+
+  ## --- Paper 1: Confirmatory Analysis ---
+  # Settings for Paper 1, which tests model clusters against pre-defined hypotheses.
+  paper1_confirmatory:
+    # This mode switch is read by the Paper 1 script.
+    analysis_mode: "confirmatory"
+
+    # Defines which of the hypotheses below should be used for the main validation.
+    active_hypothesis: "physical_vs_conceptual"
+
+    # Sensitivity options for the clustering algorithm used in the ARI validation.
+    sensitivity_analysis:
+      enable_agglomerative: true   # If true, runs Agglomerative clustering alongside K-Means.
+      l2_normalize: true           # If true, L2-normalizes vectors before clustering.
+
+    # Collection of pre-defined hypotheses for the confirmatory test.
+    # Key: Conceptual = 0, Physical = 1
+    hypotheses:
+      physical_vs_conceptual:
+        ma: 0
+        mu: 0
+        wabi: 0
+        sabi: 0
+        wabi_sabi: 0
+        en: 0
+        engawa: 1
+        shōji: 1
+        fusuma: 1
+        tokonoma: 1
+        chigaidana: 1
+        doma: 1
+        genkan: 1
+        tomeishi: 1
+        ikezuishi: 1
+        shakkei: 0
+        roji: 1
+        torii: 1
+        shimenawa: 1
+        tsuboniwa: 1
+        byōbu: 1
+        hisashi: 1
+        haiden: 1
+        sandō: 1
+        aware: 0
+        honden: 1
+        chashitsu: 1
+        karesansui: 1
+
+      tokonoma_as_conceptual:
+        ma: 0
+        mu: 0
+        wabi: 0
+        sabi: 0
+        wabi_sabi: 0
+        en: 0
+        engawa: 1
+        shōji: 1
+        fusuma: 1
+        tokonoma: 0
+        chigaidana: 1
+        doma: 1
+        genkan: 1
+        tomeishi: 1
+        ikezuishi: 1
+        shakkei: 0
+        roji: 1
+        torii: 1
+        shimenawa: 1
+        tsuboniwa: 1
+        byōbu: 1
+        hisashi: 1
+        haiden: 1
+        sandō: 1
+        aware: 0
+        honden: 1
+        chashitsu: 1
+        karesansui: 1
+
+  ## --- Paper 2: Exploratory Analysis ---
+  # NOTE: The 'paper2_exploratory:' block that was here has been
+  # MOVED to the top level to be compatible with the Paper 2 script.
+
+paper2_settings:
+  ari:
+    plot_top_n: 10
+    min_ari_threshold: 0.3  # Minimum average ARI to accept a grouping; set to 0.0 to disable
+    max_words_for_exhaustive: 28
+    include_freqs: true  # Whether to compute and append term frequencies in exemplars TXT
+# ... (other sections for paper1, paper2, paper4) ...
+
+paper3:
+  bootstrap_mode: "slow"          # slow or fast
+  permutation_iterations: 50000
+  models: ["bert"]                # keep BERT primary
+  corpora: ["FULL", "CLEAN"]
+  w2v_bootstrap_mode: "off"       # add this to silence W2V if caches are absent
+
+  fast_bootstrap_iterations: 200
+  slow_bootstrap_iterations: 2000
+
+  # ---- speed & bootstrap unit (new) ----
+  # BERT contextual precompute.
+  # The run is a broad-corpus stress-test, so contexts are retained rather than artificially balanced.
+  bootstrap_unit: "contexts"          # "contexts" (fast) or "sentences" (slow)
+  target_context_sampling: "observed" # "observed" or "balanced"
+  use_fdr_for_publication_status: true
+
+  precompute_cache_dir: "cache_paper3_bert" #Optional[str] = None
+  precompute_batch_size: 128       # safe on a 3080 Ti laptop; reduce if OOM
+
+  # Point to final shared embeddings instead of ad hoc fast/slow
+  w2v:
+    fast: {vector_size: 100, window: 9, min_count: 5, epochs: 50, workers: 1}
+    slow: {vector_size: 100, window: 9, min_count: 5, epochs: 50, workers: 1}
+
+  bert:
+    # Make provenance explicit; these flags are no-ops if unsupported,
+    # but they document intent and prevent accidental regressions.
+    use_final: true                 # <- use global bert_final hyperparams/checkpoint
+    source: "finetuned"             # <- "finetuned" vs "base"
+    prefer_best_epoch: true         # <- pick epoch with best val loss
+    pooling: "target_occurrence_mean"                  # "cls" or "mean" (match what you use elsewhere)
+    layer: "last"                   # match your “use_last_hidden_layer: true”
+    max_contexts_per_word_fast: 128
+    max_contexts_per_word_slow: 256
+    use_last_hidden_layer: true
+    fp16_inference: false                # safe on Ampere+, keeps results very close
+    allow_fallback_model: false
+    fallback_model_id: "bert-base-cased"
+
+  interchangeability:
+    enabled: true
+    concept_quantile: 0.67     # keep top 33% of occurrences nearest each concept centroid
+    min_instances: 10          # skip WPI if either side has fewer
+    min_term_contexts: 20
+    min_concept_contexts_total: 40
+    bootstrap_iterations: null # if null, reuse Paper 3 N_BOOT for WPI
+    write_plots: false
+
+word_shift_window: 10
+
+# =============================================================
+#  Bootstrap Test Settings for Paper 3
+# =============================================================
+bootstrap_groups:
+  engawa_veranda:
+    pairs:
+      - ["engawa", "veranda"]
+
+    concepts:
+      Engawa_TransitionalThreshold:
+        - threshold
+        - threshold-space
+        - liminal
+        - liminality
+        - in-between
+        - intermediary
+        - transitional
+        - transitional-zone
+        - passage-between
+        - mediating-space
+
+      Engawa_IndoorOutdoorBoundary:
+        - interior
+        - exterior
+        - indoors
+        - outdoors
+        - inside
+        - outside
+        - boundary
+        - interface
+        - adjacent
+        - garden
+
+      Engawa_LightAndVentilation:
+        - daylight
+        - filtered-light
+        - light-admission
+        - natural-light
+        - ventilation
+        - airflow
+        - breeze
+        - passive-cooling
+        - cross-ventilation
+        - seasonal-cooling
+
+      Engawa_GardenViewing:
+        - garden
+        - viewing
+        - view
+        - observation
+        - contemplation
+        - sitting
+        - resting
+        - prospect
+        - seasonal
+        - landscape
+
+      Engawa_PerimeterCirculation:
+        - perimeter
+        - peripheral
+        - corridor
+        - walkway
+        - passage
+        - circulation
+        - edge
+        - route
+        - exterior-corridor
+        - covered-passage
+
+      Veranda_ShelteredOutdoorSpace:
+        - porch
+        - roofed
+        - covered
+        - shelter
+        - shade
+        - protection
+        - weather
+        - rain
+        - sun
+        - outdoor
+
+      Veranda_SocialLeisure:
+        - socializing
+        - conversation
+        - guests
+        - entertaining
+        - leisure
+        - outdoor-living
+        - relaxation
+        - gathering
+        - hospitality
+        - recreation
+
+      Veranda_OutdoorDining:
+        - dining
+        - meal
+        - breakfast
+        - lunch
+        - tea
+        - coffee
+        - drinks
+        - table
+        - refreshment
+        - serving
+
+  tsuboniwa_impluvium:
+    pairs:
+      - ["tsuboniwa", "impluvium"]
+
+    concepts:
+      Tsuboniwa_MiniatureGarden:
+        - miniature-garden
+        - small-garden
+        - enclosed-garden
+        - courtyard-garden
+        - planted-court
+        - moss
+        - stones
+        - planting
+        - garden-composition
+        - landscape-composition
+
+      Tsuboniwa_LightAndVentilation:
+        - daylight
+        - light
+        - ventilation
+        - airflow
+        - air
+        - breeze
+        - cooling
+        - domestic
+        - interior
+        - opening
+        - indirect-light
+
+      Tsuboniwa_InteriorGardenView:
+        - view
+        - viewing
+        - observation
+        - prospect
+        - visual
+        - relief
+        - interior
+        - room
+        - enclosed
+        - outlook
+
+      Impluvium_RainwaterCatchment:
+        - rainwater
+        - collection
+        - catchment
+        - runoff
+        - drainage
+        - drain
+        - channel
+        - cistern
+        - water-control
+        - water-collection
+
+      Impluvium_AtriumBasin:
+        - atrium
+        - basin
+        - sunken-basin
+        - pool
+        - shallow-pool
+        - courtyard
+        - opening
+        - roof
+        - central
+        - court
+        - compluvium
+        - collecting-basin
+
+      Impluvium_RomanDomesticWaterSystem:
+        - roman
+        - domus
+        - atrium
+        - columns
+        - house
+        - villa
+        - antiquity
+        - household
+        - drainage
+        - water-system
+        - domestic-water
+
+  shoji_fusuma:
+    pairs:
+      - ["shōji", "fusuma"]
+
+    concepts:
+      Shoji_LightDiffusion:
+        - translucent
+        - translucency
+        - daylight
+        - light
+        - light-filtering
+        - filtered-light
+        - filtering
+        - diffused-light
+        - diffusion
+        - soft-light
+        - glow
+
+      Shoji_PaperLattice:
+        - paper
+        - lattice
+        - wooden-lattice
+        - grid
+        - frame
+        - paper-frame
+        - thin-paper
+        - latticework
+        - panel-frame
+        - wooden-grid
+        - japanese-paper
+        - washi
+        - light-diffusing
+
+      Shoji_FilteredPrivacy:
+        - partial-privacy
+        - privacy
+        - screen
+        - barrier
+        - translucent
+        - semi-transparent
+        - visual-filter
+        - filtered-view
+        - veiled
+        - soft-boundary
+
+      Fusuma_OpaquePartition:
+        - opaque
+        - opacity
+        - concealment
+        - enclosure
+        - closed
+        - visual-barrier
+        - private
+        - seclusion
+        - solid
+        - blocked-view
+
+      Fusuma_PaintedDecorativePanel:
+        - painting
+        - painted
+        - decoration
+        - decorative
+        - artwork
+        - image
+        - motif
+        - ornament
+        - pictorial
+        - decorated-panel
+
+      Fusuma_FlexibleRoomDivision:
+        - sliding
+        - track
+        - movable
+        - partition
+        - divider
+        - room-divider
+        - movable-wall
+        - room-separation
+        - flexible-space
+        - interior-layout
+
+  tokonoma_chigaidana:
+    pairs:
+      - ["tokonoma", "chigaidana"]
+
+    concepts:
+      Tokonoma_RecessedAlcove:
+        - alcove
+        - recess
+        - niche
+        - recessed-space
+        - wall-recess
+        - formal-alcove
+        - focal-recess
+        - architectural-recess
+        - honored-alcove
+        - alcove-space
+
+      Tokonoma_RitualDisplay:
+        - ritual
+        - ceremonial
+        - ceremony
+        - sacred
+        - offering
+        - reverence
+        - honorific
+        - solemn
+        - devotional
+        - formal-placement
+
+      Tokonoma_FocalDisplay:
+        - scroll
+        - hanging-scroll
+        - flower
+        - ikebana
+        - artwork
+        - calligraphy
+        - presentation
+        - focal-point
+        - ornamental-focus
+        - contemplative-focus
+
+      Chigaidana_StaggeredShelving:
+        - shelf
+        - shelves
+        - shelving
+        - staggered-shelves
+        - tiered-shelf
+        - built-in-shelf
+        - ledge
+        - shelf-display
+        - shelf-composition
+        - stepped-shelves
+
+      Chigaidana_BuiltInStorageAndDisplay:
+        - storage
+        - cabinet
+        - built-in-furnishing
+        - furnishing
+        - fixture
+        - interior-fitting
+        - storage-display
+        - decorative-storage
+        - display-furniture
+        - architectural-furniture
+
+      Chigaidana_FormalShoinSetting:
+        - shoin
+        - shoin-zukuri
+        - reception-room
+        - tatami-room
+        - zashiki
+        - formal-room
+        - traditional-room
+        - elite-residence
+        - room-composition
+        - built-in-composition
+
+  ma_mu:
+    pairs:
+      - ["ma", "mu"]
+
+    concepts:
+      Ma_RelationalSpacing:
+        - interval
+        - spacing
+        - gap
+        - distance
+        - between
+        - relation
+        - adjacency
+        - proportion
+        - rhythm
+        - measured-distance
+
+      Ma_TemporalPause:
+        - pause
+        - silence
+        - stillness
+        - quiet
+        - rest
+        - suspension
+        - breath
+        - waiting
+        - temporal-pause
+        - hush
+
+      Ma_CompositionalBalance:
+        - relation
+        - arrangement
+        - composition
+        - balance
+        - proportion
+        - rhythm
+        - adjacency
+        - coordination
+        - relational-field
+        - compositional-order
+
+      Ma_NegativeSpace:
+        - void
+        - emptiness
+        - blank
+        - vacant
+        - hollow
+        - unfilled
+        - negative-space
+        - blankness
+        - empty-field
+        - spatial-void
+
+      Mu_NothingnessAndNonbeing:
+        - nothingness
+        - nonbeing
+        - nonexistence
+        - nullity
+        - negation
+        - nihil
+        - no-thing
+        - unbeing
+        - nonentity
+        - ontological-absence
+
+      Mu_IndeterminatePotentiality:
+        - potential
+        - possibility
+        - latent
+        - indeterminate
+        - undefined
+        - receptive
+        - open-ended
+        - emergence
+        - unrealized
+        - formless
+
+  wabi_sabi:
+    pairs:
+      - ["wabi", "sabi"]
+
+    concepts:
+      Wabi_AustereSimplicity:
+        - austere
+        - spare
+        - minimal
+        - simplicity
+        - reduced
+        - bare
+        - ascetic
+        - unembellished
+        - severe
+        - restrained
+
+      Wabi_HumblePlainness:
+        - humble
+        - modest
+        - plain
+        - unpretentious
+        - frugal
+        - unassuming
+        - self-effacing
+        - poverty
+        - ordinary
+        - simple
+
+      Wabi_RusticMateriality:
+        - rustic
+        - raw
+        - natural
+        - earth
+        - wood
+        - stone
+        - texture
+        - handmade
+        - grain
+        - tactile
+
+      Sabi_AgingAndPatina:
+        - aged
+        - weathered
+        - patina
+        - oxidation
+        - faded
+        - worn
+        - surface
+        - time-marked
+        - tarnish
+        - mellowed
+
+      Sabi_ImpermanenceAndMelancholy:
+        - transient
+        - impermanent
+        - fleeting
+        - ephemeral
+        - melancholy
+        - solitude
+        - loneliness
+        - wistful
+        - contemplative
+        - passing
+
+      Sabi_MaterialDecay:
+        - decay
+        - deterioration
+        - withering
+        - desolation
+        - ruin
+        - erosion
+        - crumbling
+        - dilapidation
+        - oldness
+        - decline
+
+# =============================================================
+#  Classification Categories
+# =============================================================
+paper4_classification_categories:
+  domain_register:
+    - "This term primarily refers to a material architectural element, spatial component, or physically bounded place."
+    - "This term primarily refers to a conceptual, relational, or philosophical architectural idea."
+    - "This term primarily refers to a virtual, perceived, atmospheric, or representational spatial condition."
+    - "This term primarily refers to a mediating or threshold condition between domains, rather than a single fixed domain."
+    - "This term primarily refers to a mixed condition in which material and virtual spatial logics remain simultaneously active."
+
+  architecture_relations:
+    - "This term is strongly associated with boundary or edge conditions."
+    - "This term is strongly associated with threshold, transition, or mediation."
+    - "This term is strongly associated with liminality or in-between spatial status."
+    - "This term is strongly associated with permeability, weak enclosure, or filtering."
+    - "This term is strongly associated with display, ritual framing, or representational insertion."
+    - "This term is strongly associated with visual incorporation, framing, borrowing, or appropriated scenery."
+
+paper4_category_label_short:
+  "This term primarily refers to a material architectural element, spatial component, or physically bounded place.": "PHYS-SPAT"
+  "This term primarily refers to a conceptual, relational, or philosophical architectural idea.": "SYM-THEO"
+  "This term primarily refers to a virtual, perceived, atmospheric, or representational spatial condition.": "REP-IMG"
+  "This term primarily refers to a mediating or threshold condition between domains, rather than a single fixed domain.": "BOUND-TRANS"
+  "This term primarily refers to a mixed condition in which material and virtual spatial logics remain simultaneously active.": "HYBRID"
+  "This term is strongly associated with boundary or edge conditions.": "EDGE"
+  "This term is strongly associated with threshold, transition, or mediation.": "TRAN"
+  "This term is strongly associated with liminality or in-between spatial status.": "LIM"
+  "This term is strongly associated with permeability, weak enclosure, or filtering.": "PERM"
+  "This term is strongly associated with display, ritual framing, or representational insertion.": "DISP"
+  "This term is strongly associated with visual incorporation, framing, borrowing, or appropriated scenery.": "VINC"
+
+  #spatial_categories:
+   #- "This concept describes a physical, indoor architectural space."
+   #- "This concept describes a virtual or perceived indoor architectural space."
+   #- "This concept describes a physical space that is in-between the interior and exterior."
+   #- "This concept describes a virtual or perceived space that is in-between the interior and exterior."
+   #- "This concept describes a physical, outdoor architectural space or garden element."
+   #- "This concept describes a virtual or perceived outdoor space, like borrowed scenery."
+  #boundary_categories:
+   #- "This concept describes a physical object that acts as a boundary or border."
+   #- "This concept describes a virtual or perceived boundary or border."
+  #both_categories:
+   #- "This concept describes both a physical indoor space and a physical boundary."
+   #- "This concept describes both a physical indoor space and a virtual boundary."
+   #- "This concept describes both a virtual indoor space and a physical boundary."
+   #- "This concept describes both a virtual indoor space and a virtual boundary."
+   #- "This concept describes both a physical indoor space and a virtual indoor space."
+   #- "This concept describes both an in-between physical space and a physical boundary."
+   #- "This concept describes both an in-between physical space and a virtual boundary."
+   #- "This concept describes both an in-between virtual space and a physical boundary."
+   #- "This concept describes both an in-between virtual space and a virtual boundary."
+   #- "This concept describes both an in-between physical space and an in-between virtual space."
+   #- "This concept describes both an outdoor physical space and a physical boundary."
+   #- "This concept describes both an outdoor physical space and a virtual boundary."
+   #- "This concept describes both an outdoor virtual space and a physical boundary."
+   #- "This concept describes both an outdoor virtual space and a virtual boundary."
+   #- "This concept describes both an outdoor physical space and an outdoor virtual space."
+   #- "This concept describes both a physical boundary and a virtual boundary."
+
+  #concept_categories:
+   #- "This concept describes both a concept, or a philosophy which can be applied only to both, physical and virtual spaces."
+   #- "This concept describes both a concept, or a philosophy which can be applied only to physical spaces."
+   #- "This concept describes both a concept, or a philosophy which can be applied only to virtual spaces."
+   #- "This concept describes both a concept, or a philosophy which can be applied only to both, physical and virtual boundaries."
+   #- "This concept describes both a concept, or a philosophy which can be applied only to physical boundaries."
+   #- "This concept describes both a concept, or a philosophy which can be applied only to virtual boundaries."
+   #- "This concept describes both a concept, or a philosophy which can be applied to all the above."
+
+paper4_concept_alignment_targets:
+  - engawa
+
+paper4_concept_definitions:
+  boundary_edge_axis:
+    - edge
+    - border
+    - boundary
+    - threshold
+    - verge
+    - margin
+    - frame
+    - periphery
+
+  connector_flow_axis:
+    - connect
+    - connection
+    - passage
+    - transition
+    - movement
+    - circulation
+    - flow
+    - link
+
+  river_bank_probe:
+    - riverbank
+    - river-bank
+    - waterside
+    - embankment
+    - riverside
+
+# =============================================================
+#  Normalization Mapping
+# =============================================================
+# THIS BLOCK IS RESTORED FROM YOUR ORIGINAL FILE.
+# It is not used by the Paper 1 script, which only reads
+# this data from filters.yaml.
+# =============================================================
+normalization_mapping:
+  "縁側": "engawa"
+  "えんがわ": "engawa"
+  "間": "ma"
+  "ま": "ma"
+  "ma": "ma"
+  "無": "mu"
+  "む": "mu"
+  "mu": "mu"
+  "借景": "shakkei"
+  "しゃっけい": "shakkei"
+  "borrowedscenery": "shakkei"
+  "borrowed scenery": "shakkei"
+  "borrowed-scenery": "shakkei"
+  "borrowed_scenery": "shakkei"
+  "奥": "oku"
+  "おく": "oku"
+  "oku": "oku"
+  "床の間": "tokonoma"
+  "とこのま": "tokonoma"
+  "障子": "shōji"
+  "しょうじ": "shōji"
+  "shoji": "shōji"
+  "shouji": "shōji"
+  "襖": "fusuma"
+  "ふすま": "fusuma"
+  "違い棚": "chigaidana"
+  "ちがいだな": "chigaidana"
+  "土間": "doma"
+  "どま": "doma"
+  "玄関": "genkan"
+  "げんかん": "genkan"
+  "止石": "tomeishi"
+  "とめいし": "tomeishi"
+  "stop stone": "tomeishi"
+  "stop_stone": "tomeishi"
+  "stop-stone": "tomeishi"
+  "stoppingstone": "tomeishi"
+  "stopping-stone": "tomeishi"
+  "stopping_stone": "tomeishi"
+  "stopping stone": "tomeishi"
+  "いけず石": "ikezuishi"
+  "行けず石": "ikezuishi"
+  "いけずいし": "ikezuishi"
+  "ikezu ishi": "ikezuishi"
+  "ikezu-ishi": "ikezuishi"
+  "ikezu_ishi": "ikezuishi"
+  "路地": "roji"
+  "ろじ": "roji"
+  "鳥居": "torii"
+  "とりい": "torii"
+  "torii gate": "torii"
+  "torii-gate": "torii"
+  "torii_gate": "torii"
+  "注連縄": "shimenawa"
+  "しめなわ": "shimenawa"
+  "余白": "yohaku"
+  "よはく": "yohaku"
+  "坪庭": "tsuboniwa"
+  "つぼにわ": "tsuboniwa"
+  "tsubo niwa": "tsuboniwa"
+  "tsubo-niwa": "tsuboniwa"
+  "tsubo_niwa": "tsuboniwa"
+  "niwa": "niwa"
+  "庭": "niwa"
+  "にわ": "niwa"
+  "侘": "wabi"
+  "わび": "wabi"
+  "寂": "sabi"
+  "さび": "sabi"
+  "wabi-sabi": "wabi_sabi"  # Glued
+  "wabisabi": "wabi_sabi"
+  "wabi sabi": "wabi_sabi"
+  "わびさび": "wabi_sabi"
+  "侘寂": "wabi_sabi"
+  "縁": "en"
+  "えん": "en"
+  "en": "en"
+  "枯山水": "karesansui"
+  "かれさんすい": "karesansui"
+  "drylandscape": "karesansui"
+  "dry landscape": "karesansui"
+  "dry-landscape": "karesansui"
+  "dry_landscape": "karesansui"
+  "drygarden": "karesansui"
+  "dry garden": "karesansui"
+  "dry-garden": "karesansui"
+  "dry_garden": "karesansui"
+  "dry yard": "karesansui"
+  "dry-yard": "karesansui"
+  "dry_yard": "karesansui"
+  "rock yard": "karesansui"
+  "rock-yard": "karesansui"
+  "rock_yard": "karesansui"
+  "屏風": "byōbu"
+  "びょうぶ": "byōbu"
+  "byobu": "byōbu"
+  "byōbu screen": "byōbu"
+  "folding screen": "byōbu"
+  "屏風屏": "byōbu"
+  "廂": "hisashi"
+  "庇": "hisashi"
+  "ひさし": "hisashi"
+  "拝殿": "haiden"
+  "はいでん": "haiden"
+  "haiden": "haiden"
+  "worship hall": "haiden"
+  "haiden hall": "haiden"
+  "参道": "sandō"
+  "さんどう": "sandō"
+  "sando": "sandō"
+  "approach path": "sandō"
+  "shrine path": "sandō"
+  "sando path": "sandō"
+  "哀れ": "aware"
+  "物の哀れ": "aware"
+  "aware": "aware"
+  "mono no aware": "aware"
+  "pathos of things": "aware"
+  "物のあはれ": "aware"
+  "本殿": "honden"
+  "ほんでん": "honden"
+  "honden": "honden"
+  "main hall": "honden"
+  "shrine sanctuary": "honden"
+  "honden hall": "honden"
+  "茶室": "chashitsu"
+  "ちゃしつ": "chashitsu"
+  "chashitsu": "chashitsu"
+  "tea room": "chashitsu"
+  "teahouse": "chashitsu"
+  "chashitsu room": "chashitsu"
