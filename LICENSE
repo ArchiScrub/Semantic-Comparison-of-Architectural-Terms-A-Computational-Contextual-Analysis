@@ -1,21 +1,60 @@
-MIT License
+# License
 
-Copyright (c) 2026 ArchiScrub
+This repository contains both software code and non-code research materials associated with **Semantic Comparison of Architectural Terms: A Computational Contextual Analysis**.
+
+Unless explicitly stated otherwise:
+
+1. Software code is licensed under the MIT License.
+2. Non-code research materials are licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+
+Non-code research materials include, but are not limited to, text files, tables, configuration files, derived datasets, CSV outputs, logs, manifests, documentation, generated figures, and other research outputs.
+
+This license does not override the licenses, copyright terms, access restrictions, or usage conditions of any third-party materials, external datasets, pretrained models, libraries, source texts, or referenced materials used in or cited by this repository.
+
+---
+
+## MIT License for software code
+
+Copyright (c) 2026 Gjata G. and Yamada S.]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+of this software and associated documentation files (the “Software”), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING
+FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+---
+
+## License for non-code content
+
+Unless explicitly stated otherwise, all non-code content in this repository is licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+
+You may reuse this material in any context, including research, teaching, and commercial work. The conditions are that you:
+
+1. Credit the original authors.
+2. Mention this license.
+3. Make clear whether you modified the material.
+
+The full legal text of the CC BY 4.0 license is available at:
+
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+---
+
+## Suggested attribution
+
+When using or citing materials from this repository, please cite the associated study and, where relevant, the repository itself:
+
+Gjata G. and Yamada S. (2026). *Semantic Comparison of Architectural Terms: A Computational Contextual Analysis*. GitHub repository: https://github.com/ArchiScrub/Semantic-Comparison-of-Architectural-Terms-A-Computational-Contextual-Analysis
