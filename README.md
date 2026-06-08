@@ -1,0 +1,2 @@
+# Semantic-Comparison-of-Architectural-Terms-A-Computational-Contextual-Analysis
+Contextual BERT study of architectural, conceptual, and aesthetic term pairs in Japanese and cross-cultural discourse. It compares engawa/veranda, tsuboniwa/impluvium, shōji/fusuma, tokonoma/chigaidana, ma/mu, and wabi/sabi under FULL/CLEAN audits to reveal semantic overlap, dominance, divergence and near-fusion across declared fields and contexts.
